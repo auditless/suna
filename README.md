@@ -1,146 +1,110 @@
 <p align="center">
-  <a href="https://github.com/auditless/cairo-template/actions/workflows/test.yaml">
-    <img src="https://github.com/auditless/cairo-template/actions/workflows/test.yaml/badge.svg?event=push" alt="CI Badge"/>
-  </a>
+  <img src=".github/cover.png" alt="Suna Cover Photo" width="400">
 </p>
 
-# Minimal Cairo 1.0 Template  ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-green.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/auditless/cairo-template/blob/main/LICENSE)
+# Suna ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-green.svg) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/auditless/suna/blob/main/LICENSE) <a href="https://github.com/auditless/suna/actions/workflows/test.yaml"> <img src="https://github.com/auditless/suna/actions/workflows/test.yaml/badge.svg?event=push" alt="CI Badge"/> </a>
 
 [Built with **`auditless/cairo-template`**](https://github.com/auditless/cairo-template)
 
-A minimal template for building smart contracts with Cairo 1.0
-using the [Quaireaux](https://github.com/keep-starknet-strange/quaireaux) project defaults.
+Typesafe opinionated abstractions for developing Cairo 1.0 smart contracts.
+Originally created to facilitate [Yagi Finance](https://www.yagi.fi) smart contract development.
 
-## How it works
+## What is included
 
-- No submodules, forks or other heavy machinery
-- Uses the [`cairo-test-runner`](https://github.com/starkware-libs/cairo/blob/main/crates/cairo-lang-test-runner/README.md) binary for running tests
-- Built as a [Scarb](https://github.com/software-mansion/scarb) package for reusability and uses Scarb dependencies for libraries
-- Has reproducible builds using GitHub Actions
-- Includes a standard Makefile for commonly used commands
+- [`suna.math.u256`](https://github.com/auditless/suna/blob/main/src/math/u256.cairo): Missing trait implementations for the `u256` data type: `U256Zeroable` and a truncated division implementation `U256TruncatedDiv` of `Div<u256>`
+- [`suna.math.u60f18`](https://github.com/auditless/suna/blob/main/src/math/u60f18.cairo): An unsigned fixed point decimal type based on `u256`; `MulDiv` trait and operators
 
-## Installing dependencies
+## Warning
 
-### Step 1: Install Cairo 1.0 (guide by [Abdel](https://github.com/abdelhamidbakhta))
+Suna is an experimental and unaudited library and is subject to a lot of iteration.
+There may be bugs.
 
-If you are on an x86 Linux system and able to use the release binary,
-you can download Cairo here https://github.com/starkware-libs/cairo/releases.
 
-For everyone, else, we recommend compiling Cairo from source like so:
+## How to use the library
 
-```bash
-# Install stable Rust
-$ rustup override set stable && rustup update
+You can directly add Suna to your Scarb dependencies:
 
-# Clone the Cairo compiler in $HOME/Bin
-$ cd ~/Bin && git clone git@github.com:starkware-libs/cairo.git && cd cairo
-
-# Generate release binaries
-$ cargo build --all --release
+```toml
+[dependencies]
+suna = { git = "https://github.com/auditless/suna.git" }
 ```
 
-**NOTE: Keeping Cairo up to date**
+The below examples are illustrative and you can find more
+functions by reading the code and tests directly.
 
-Now that your Cairo compiler is in a cloned repository, all you will need to do
-is pull the latest changes and rebuild as follows:
+### `u256` trait implementations
 
-```bash
-$ cd ~/Bin/cairo && git fetch && git pull && cargo build --all --release
+Most Defi applications will use the `u256` type to deal with token amounts.
+Unfortunately the trait implementations are not yet complete.
+To add support for `u256` division/mod operations, add the following:
+
+```cairo
+use suna::math::u256::U256TruncatedDiv;
+use suna::math::u256::U256TruncatedDivEq;
+use suna::math::u256::U256TruncatedRem;
+use suna::math::u256::U256TruncatedRemEq;
+
+let a: u256 = 10.into();
+let b: u256 = 2.into();
+let c = a / b; // this will now work
 ```
 
-### Step 2: Add Cairo 1.0 executables to your path
+### `MulDiv` trait
 
-```bash
-export PATH="$HOME/Bin/cairo/target/release:$PATH"
+When building a yield/pooling application, you may need a way to
+calculate how much of an underlying asset a given share owner
+controls. You can do it as follows:
+
+```cairo
+use suna::math::u60f18::U256MulDiv;
+
+let total_supply: u256 = 10000.into();
+let shares: u256 = 33.into();
+let total_assets: u256 = 853000000000000000000.into();
+// Calculates shares * total_assets / total_supply safely
+let assets_owned = U256MulDiv::mul_div(shares, total_assets, total_supply);
 ```
 
-**NOTE: If installing from a Linux binary, adapt the destination path accordingly.**
+### An 18-decimal fixed point type `U60F18`
 
-This will make available several binaries. The one we use is called `cairo-test`.
+You may also want to maintain certain fractional values such as weights
+or interest rates in your application using 18 decimals. To do that,
+you can use our `U60F18` type which supports conversion from `u256`
+and many of the standard operators:
 
-### Step 3: Install the Cairo package manager Scarb
+```cairo
+use traits::Into;
+use suna::math::u60f18::U256ToU60F18;
+use suna::math::u60f18::U60F18DivEq;
 
-Follow the installation guide in [Scarb's Repository](https://github.com/software-mansion/scarb).
-
-### Step 4: Setup Language Server
-
-#### VS Code Extension
-
-- Disable previous Cairo 0.x extension
-- Install the Cairo 1 extension for proper syntax highlighting and code navigation.
-Just follow the steps indicated [here](https://github.com/starkware-libs/cairo/blob/main/vscode-cairo/README.md).
-
-#### Cairo Language Server
-
-From [Step 1](#step-1-install-cairo-10-guide-by-abdel), the `cairo-language-server` binary should be built and executing this command will copy its path into your clipboard.
-
-```bash
-$ which cairo-language-server | pbcopy
+// Represent an interest rate of 2%
+let mut interest_rate: U60F18 = 2.into();
+interest_rate /= 100.into();
 ```
 
-Update the `languageServerPath` of the Cairo 1.0 extension by pasting the path.
+## Design principles
 
-## How to use this template
+- Be useful to developers building production Cairo contracts
+- Design from first principles with both Rust and smart contract idioms in mind
+- Build typesafe and efficient abstractions that are consistently designed
+- Respect and embrace the `corelib` trait hierarchy
+- Aspire to build well-documented and declarative code
 
-First you will need to clone the repository or click the `Use this template` button
-at the top of the page to create a new repository based on the template.
+## How to contribute
 
-Next, you will want to update the configuration files with the name of your project:
-
-```
-├── .cairo_project.toml
-└── .Scarb.toml
-```
-
-## Working with your project
-
-The Cairo template currently supports building and testing contracts.
-
-### Build
-
-Build the contracts.
-
-```bash
-$ make build
-```
-
-### Test
-
-Run the tests in `src/test`:
-
-```bash
-$ make test
-```
-
-### Format
-
-Format the Cairo source code (using Scarb):
-
-```bash
-$ make fmt
-```
-
-### Sierra (advanced)
-
-View the compiled Sierra output of your Cairo code:
-
-```bash
-$ make sierra
-```
+- Read the Cairo 1.0 setup guide at https://github.com/auditless/cairo-template
+- Check our issues for scoped tasks or propose/request a new one by opening an issue
+- Submit a PR linking the relevant issue
+- You may also submit a PR that fixes a bug or nit directly
 
 ## Thanks to
 
-- The [Quaireaux](https://github.com/keep-starknet-strange/quaireaux) team for coming up with
-this configuration and especially [Abdel](https://github.com/abdelhamidbakhta) for helping me with Cairo 1.0 installation
-- [Paul Berg](https://github.com/PaulRBerg) and the [foundry-template](https://github.com/paulrberg/foundry-template) project which served as inspiration
+- The [Quaireaux](https://github.com/keep-starknet-strange/quaireaux) team for paving the way for Cairo 1.0 library development
+- The [Scarb](https://github.com/software-mansion/scarb) contributors for creating a pioneering package manager which we rely on
+- The [OpenZeppelin](https://github.com/OpenZeppelin/openzeppelin-contracts) team for the mulDiv interface
+- S. Tsuchiya for the cover photo
 - Last but not least, the StarkWare team for building the first smart contract language that is a joy to use
-
-## Other templates
-
-- [ArgentX template](https://github.com/argentlabs/starknet-build/tree/main/cairo1.0) is built as a fork of the compiler
-- [Eni's cairo1-template](https://github.com/msaug/cairo1-template) uses git submodules for installation
-- [Shramee's Starklings](https://github.com/shramee/starklings-cairo1) use the cairo1 crates as libraries and builds its own framework
 
 ## License
 
-[MIT](https://github.com/auditless/cairo-template/blob/main/LICENSE) © [Auditless Limited](https://www.auditless.com)
+[MIT](https://github.com/auditless/suna/blob/main/LICENSE) © [Auditless Limited](https://www.auditless.com)
