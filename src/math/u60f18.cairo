@@ -2,6 +2,7 @@
 
 use debug::PrintTrait;
 use traits::Into;
+use starknet::storage_access::StorageAccess;
 
 use suna::math::u256::U256TruncatedDiv;
 use suna::math::u256::U256TruncatedRem;
