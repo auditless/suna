@@ -178,5 +178,15 @@ impl U60F18PrintImpl of PrintTrait::<U60F18> {
         self.scaled.print();
     }
 }
-// TODO: Implement StorageAccess once it's testable
 
+/// This is a ChatGPT generated StorageAccess implementation
+/// Do not trust it until it's testable
+impl StorageAccessU60F18 of StorageAccess::<U60F18> {
+    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<U60F18> {
+        Result::Ok(U256ToU60F18::into(StorageAccess::<u256>::read(address_domain, base)?))
+    }
+
+    fn write(address_domain: u32, base: StorageBaseAddress, value: U60F18) -> SyscallResult<()> {
+        StorageAccess::<u256>::write(address_domain, base, U60F18ToU256::into(value))
+    }
+}
