@@ -1,13 +1,13 @@
 //! Missing corelib trait implementations for u256.
 
-use array::ArrayTrait;     
+use array::ArrayTrait;
 use zeroable::Zeroable;
 
 /// Canonical implementation of Zeroable for u256.
 impl U256Zeroable of Zeroable::<u256> {
     #[inline(always)]
     fn zero() -> u256 {
-        u256{low: 0_u128, high: 0_u128}
+        u256 { low: 0_u128, high: 0_u128 }
     }
 
     #[inline(always)]
@@ -29,7 +29,7 @@ impl U256Zeroable of Zeroable::<u256> {
 impl U256TruncatedDiv of Div::<u256> {
     fn div(a: u256, b: u256) -> u256 {
         assert(a.high == 0_u128 & b.high == 0_u128, 'u256 too large');
-        u256{low: a.low / b.low, high: 0_u128}
+        u256 { low: a.low / b.low, high: 0_u128 }
     }
 }
 
@@ -45,7 +45,7 @@ impl U256TruncatedDivEq of DivEq::<u256> {
 impl U256TruncatedRem of Rem::<u256> {
     fn rem(a: u256, b: u256) -> u256 {
         assert(a.high == 0_u128 & b.high == 0_u128, 'u256 too large');
-        u256{low: a.low % b.low, high: 0_u128}
+        u256 { low: a.low % b.low, high: 0_u128 }
     }
 }
 
