@@ -1,7 +1,7 @@
 use debug::PrintTrait;
 use traits::Into;
 
-use suna::math::u60f18::FeltToU60F18;
+use suna::math::u60f18::Felt252ToU60F18;
 use suna::math::u60f18::Rounding;
 use suna::math::u60f18::U256MulDiv;
 use suna::math::u60f18::U256ToU60F18;
@@ -14,12 +14,12 @@ use suna::math::u60f18::U60F18PartialOrd;
 use suna::math::u60f18::U60F18PrintImpl;
 use suna::math::u60f18::U60F18ToU256;
 
-fn t_mul_div_down(a: felt, b: felt, denominator: felt, expected: felt) {
+fn t_mul_div_down(a: felt252, b: felt252, denominator: felt252, expected: felt252) {
     let result = U256MulDiv::mul_div(a.into(), b.into(), denominator.into(), Rounding::Down(()));
     assert(result == expected.into(), 'mul_div invalid');
 }
 
-fn t_mul_div_up(a: felt, b: felt, denominator: felt, expected: felt) {
+fn t_mul_div_up(a: felt252, b: felt252, denominator: felt252, expected: felt252) {
     let result = U256MulDiv::mul_div(a.into(), b.into(), denominator.into(), Rounding::Up(()));
     assert(result == expected.into(), 'mul_div invalid');
 }
@@ -45,13 +45,13 @@ fn test_mul_div_up() {
 }
 
 #[test]
-#[should_panic(expected = ('multiplication overflow',))]
+#[should_panic(expected = ('multiplication overflow', ))]
 fn test_mul_div_down_failed() {
     U256MulDiv::mul_div(1.into(), 1.into(), 0.into(), Rounding::Down(()));
 }
 
 #[test]
-#[should_panic(expected = ('multiplication overflow',))]
+#[should_panic(expected = ('multiplication overflow', ))]
 fn test_mul_div_up_failed() {
     U256MulDiv::mul_div(1.into(), 1.into(), 0.into(), Rounding::Up(()));
 }
