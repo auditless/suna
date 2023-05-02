@@ -45,13 +45,13 @@ fn test_mul_div_up() {
 }
 
 #[test]
-#[should_panic(expected = ('multiplication overflow', ))]
+#[should_panic(expected: ('multiplication overflow', ))]
 fn test_mul_div_down_failed() {
     U256MulDiv::mul_div(1.into(), 1.into(), 0.into(), Rounding::Down(()));
 }
 
 #[test]
-#[should_panic(expected = ('multiplication overflow', ))]
+#[should_panic(expected: ('multiplication overflow', ))]
 fn test_mul_div_up_failed() {
     U256MulDiv::mul_div(1.into(), 1.into(), 0.into(), Rounding::Up(()));
 }
