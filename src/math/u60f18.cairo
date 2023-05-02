@@ -3,9 +3,9 @@
 use debug::PrintTrait;
 use traits::Into;
 
-use suna::math::u256::U256TruncatedDiv;
-use suna::math::u256::U256TruncatedRem;
-use suna::math::u256::U256Zeroable;
+use core::integer::U256Div;
+use core::integer::U256Rem;
+use core::zeroable::Zeroable;
 
 /// Rounding mode.
 #[derive(Copy, Drop)]
@@ -24,9 +24,7 @@ fn mul_div_down(a: u256, b: u256, denominator: u256) -> u256 {
     // let max_u256 = u256{low: max_u128, high: max_u128};
     // TODO: Change this back when u256 non-truncating division is implemented
     let max_u256 = 0xffffffffffffffffffffffffffffffff.into();
-    let cond = U256Zeroable::is_non_zero(
-        denominator
-    ) & (U256Zeroable::is_zero(b) | a <= max_u256 / b);
+    let cond = Zeroable::is_non_zero(denominator) & (Zeroable::is_zero(b) | a <= max_u256 / b);
     assert(cond, 'multiplication overflow');
     a * b / denominator
 }
@@ -41,7 +39,7 @@ trait MulDiv<T> {
     fn mul_div(a: T, b: T, denominator: T, rounding: Rounding) -> T;
 }
 
-impl U256MulDiv of MulDiv::<u256> {
+impl U256MulDiv of MulDiv<u256> {
     fn mul_div(a: u256, b: u256, denominator: u256, rounding: Rounding) -> u256 {
         let result = mul_div_down(a, b, denominator);
         match rounding {
@@ -68,61 +66,61 @@ struct U60F18 {
     scaled: u256,
 }
 
-impl U60F18Add of Add::<U60F18> {
+impl U60F18Add of Add<U60F18> {
     fn add(a: U60F18, b: U60F18) -> U60F18 {
         U60F18 { scaled: a.scaled + b.scaled }
     }
 }
 
-impl U60F18AddEq of AddEq::<U60F18> {
+impl U60F18AddEq of AddEq<U60F18> {
     #[inline(always)]
     fn add_eq(ref self: U60F18, other: U60F18) {
         self = Add::add(self, other);
     }
 }
 
-impl U60F18Sub of Sub::<U60F18> {
+impl U60F18Sub of Sub<U60F18> {
     fn sub(a: U60F18, b: U60F18) -> U60F18 {
         U60F18 { scaled: a.scaled - b.scaled }
     }
 }
 
-impl U60F18SubEq of SubEq::<U60F18> {
+impl U60F18SubEq of SubEq<U60F18> {
     #[inline(always)]
     fn sub_eq(ref self: U60F18, other: U60F18) {
         self = Sub::sub(self, other);
     }
 }
 
-impl U60F18Mul of Mul::<U60F18> {
+impl U60F18Mul of Mul<U60F18> {
     fn mul(a: U60F18, b: U60F18) -> U60F18 {
         let base: u256 = 1000000000000000000.into();
         U60F18 { scaled: mul_div_down(a.scaled, b.scaled, base) }
     }
 }
 
-impl U60F18MulEq of MulEq::<U60F18> {
+impl U60F18MulEq of MulEq<U60F18> {
     #[inline(always)]
     fn mul_eq(ref self: U60F18, other: U60F18) {
         self = Mul::mul(self, other);
     }
 }
 
-impl U60F18Div of Div::<U60F18> {
+impl U60F18Div of Div<U60F18> {
     fn div(a: U60F18, b: U60F18) -> U60F18 {
         let base: u256 = 1000000000000000000.into();
         U60F18 { scaled: mul_div_down(a.scaled, base, b.scaled) }
     }
 }
 
-impl U60F18DivEq of DivEq::<U60F18> {
+impl U60F18DivEq of DivEq<U60F18> {
     #[inline(always)]
     fn div_eq(ref self: U60F18, other: U60F18) {
         self = Div::div(self, other);
     }
 }
 
-impl U60F18PartialEq of PartialEq::<U60F18> {
+impl U60F18PartialEq of PartialEq<U60F18> {
     #[inline(always)]
     fn eq(a: U60F18, b: U60F18) -> bool {
         a.scaled == b.scaled
@@ -133,7 +131,7 @@ impl U60F18PartialEq of PartialEq::<U60F18> {
     }
 }
 
-impl U60F18PartialOrd of PartialOrd::<U60F18> {
+impl U60F18PartialOrd of PartialOrd<U60F18> {
     #[inline(always)]
     fn le(a: U60F18, b: U60F18) -> bool {
         a.scaled <= b.scaled
@@ -152,31 +150,50 @@ impl U60F18PartialOrd of PartialOrd::<U60F18> {
     }
 }
 
-impl U60F18ToU256 of Into::<U60F18, u256> {
+impl U60F18ToU256 of Into<U60F18, u256> {
     fn into(self: U60F18) -> u256 {
         let base: u256 = 1000000000000000000.into();
         self.scaled / base
     }
 }
 
-impl U256ToU60F18 of Into::<u256, U60F18> {
+impl U256ToU60F18 of Into<u256, U60F18> {
     fn into(self: u256) -> U60F18 {
         let base: u256 = 1000000000000000000.into();
         U60F18 { scaled: self * base }
     }
 }
 
-impl Felt252ToU60F18 of Into::<felt252, U60F18> {
+impl Felt252ToU60F18 of Into<felt252, U60F18> {
     fn into(self: felt252) -> U60F18 {
         let a: u256 = self.into();
         a.into()
     }
 }
 
-impl U60F18PrintImpl of PrintTrait::<U60F18> {
+impl U60F18PrintImpl of PrintTrait<U60F18> {
     fn print(self: U60F18) {
         self.scaled.print();
     }
 }
+
+/// Canonical implementation of Zeroable for u256.
+impl U256Zeroable of Zeroable<u256> {
+    #[inline(always)]
+    fn zero() -> u256 {
+        u256 { low: 0_u128, high: 0_u128 }
+    }
+
+    #[inline(always)]
+    fn is_zero(self: u256) -> bool {
+        self == U256Zeroable::zero()
+    }
+
+    #[inline(always)]
+    fn is_non_zero(self: u256) -> bool {
+        !self.is_zero()
+    }
+}
 // TODO: Implement StorageAccess once it's testable
+
 
