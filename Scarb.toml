@@ -3,3 +3,7 @@ name = "suna"
 version = "0.1.0"
 description = "Typesafe opinionated abstractions for developing Cairo 1.0 smart contracts"
 homepage = "https://github.com/auditless/suna"
+
+[scripts]
+sierra = "cairo-compile . -r"
+test = "cairo-test ."
