@@ -3,6 +3,7 @@
 use debug::PrintTrait;
 use traits::Into;
 
+use core::integer::BoundedInt;
 use core::integer::U256Div;
 use core::integer::U256Rem;
 use core::zeroable::Zeroable;
@@ -21,10 +22,9 @@ enum Rounding {
 
 /// Return a * b / c rounded down.
 fn mul_div_down(lhs: u256, rhs: u256, denominator: u256) -> u256 {
-    let max_u128 = 0xffffffffffffffffffffffffffffffff_u128;
+    let max_u128 = BoundedInt::max();
     let max_u256 = u256 { low: max_u128, high: max_u128 };
     // TODO: Change this back when u256 non-truncating division is implemented
-    // let max_u256 = 0xffffffffffffffffffffffffffffffff.into();
     let cond = Zeroable::is_non_zero(
         denominator
     ) & (Zeroable::is_zero(rhs) | lhs <= Div::div(max_u256, rhs));
@@ -198,4 +198,5 @@ impl U256Zeroable of Zeroable<u256> {
     }
 }
 // TODO: Implement StorageAccess once it's testable
+
 
