@@ -11,7 +11,7 @@ Originally created to facilitate [Yagi Finance](https://www.yagi.fi) smart contr
 
 ## What is included
 
-- [`suna.math.u256`](https://github.com/auditless/suna/blob/main/src/math/u256.cairo): Missing trait implementations for the `u256` data type: `U256Zeroable` and a truncated division implementation `U256TruncatedDiv` of `Div<u256>`
+- [`suna.math.u256`](https://github.com/auditless/suna/blob/main/src/math/u256.cairo): A `Zeroable` trait implementation for `u256`
 - [`suna.math.u60f18`](https://github.com/auditless/suna/blob/main/src/math/u60f18.cairo): An unsigned fixed point decimal type based on `u256`; `MulDiv` trait and operators
 
 ## Warning
@@ -31,6 +31,19 @@ suna = { git = "https://github.com/auditless/suna.git" }
 
 The below examples are illustrative and you can find more
 functions by reading the code and tests directly.
+
+## `Zeroable` trait implementation for `u256`
+
+Most DeFi applications will use the `u256` type to deal with token amounts. Unfortunately the trait implementations are not yet complete.
+This is how you can use the Zeroable implementation:
+
+```cairo
+use suna::math::u256::U256Zeroable;
+
+let number: u256 = 33.into();
+// Check if number is zero
+Zeroable::is_zero(0)
+```
 
 ### `MulDiv` trait
 
