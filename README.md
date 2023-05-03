@@ -32,23 +32,6 @@ suna = { git = "https://github.com/auditless/suna.git" }
 The below examples are illustrative and you can find more
 functions by reading the code and tests directly.
 
-### `u256` trait implementations
-
-Most Defi applications will use the `u256` type to deal with token amounts.
-Unfortunately the trait implementations are not yet complete.
-To add support for `u256` division/mod operations, add the following:
-
-```cairo
-use suna::math::u256::U256TruncatedDiv;
-use suna::math::u256::U256TruncatedDivEq;
-use suna::math::u256::U256TruncatedRem;
-use suna::math::u256::U256TruncatedRemEq;
-
-let a: u256 = 10.into();
-let b: u256 = 2.into();
-let c = a / b; // this will now work
-```
-
 ### `MulDiv` trait
 
 When building a yield/pooling application, you may need a way to
