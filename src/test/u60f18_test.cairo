@@ -45,13 +45,13 @@ fn test_mul_div_up() {
 }
 
 #[test]
-#[should_panic(expected = ('multiplication overflow', ))]
+#[should_panic(expected: ('multiplication overflow', ))]
 fn test_mul_div_down_failed() {
     U256MulDiv::mul_div(1.into(), 1.into(), 0.into(), Rounding::Down(()));
 }
 
 #[test]
-#[should_panic(expected = ('multiplication overflow', ))]
+#[should_panic(expected: ('multiplication overflow', ))]
 fn test_mul_div_up_failed() {
     U256MulDiv::mul_div(1.into(), 1.into(), 0.into(), Rounding::Up(()));
 }
@@ -63,7 +63,6 @@ fn test_u256_to_u60f18_conversion() {
     let a_fraction: U60F18 = a.into();
     assert(a_fraction.scaled == a * base, 'u60f18 conversion invalid');
 }
-
 #[test]
 fn test_u60f18_to_u256_conversion() {
     let base: u256 = 1000000000000000000.into();
@@ -77,6 +76,7 @@ fn test_u60f18_arithmetic() {
     let a: U60F18 = 57.into();
     let mut b: U60F18 = 68.into();
     b /= 1000.into();
+    (a * b).into();
     assert(a * b == b * a, 'u60f18 mul noncommute');
     assert(b < a, 'u60f18 lt failed');
     assert(b <= a, 'u60f18 le failed');
@@ -85,3 +85,4 @@ fn test_u60f18_arithmetic() {
     b *= 1000.into();
     assert(b == 68.into(), 'u60f18 mul_eq failed');
 }
+
