@@ -9,6 +9,8 @@ use core::integer::U256Rem;
 use core::zeroable::Zeroable;
 use core::integer::U256Mul;
 
+use suna::math::u256::U256Zeroable;
+
 /// Rounding mode.
 #[derive(Copy, Drop)]
 enum Rounding {
@@ -180,23 +182,6 @@ impl U60F18PrintImpl of PrintTrait<U60F18> {
     }
 }
 
-/// Canonical implementation of Zeroable for u256.
-impl U256Zeroable of Zeroable<u256> {
-    #[inline(always)]
-    fn zero() -> u256 {
-        u256 { low: 0_u128, high: 0_u128 }
-    }
-
-    #[inline(always)]
-    fn is_zero(self: u256) -> bool {
-        self == U256Zeroable::zero()
-    }
-
-    #[inline(always)]
-    fn is_non_zero(self: u256) -> bool {
-        !self.is_zero()
-    }
-}
 // TODO: Implement StorageAccess once it's testable
 
 
