@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - "**"
+  pull_request:
+    branches:
+      - "**"
 
 env:
   ARTIFACT_RELEASE_ARCHIVE_LINK: https://api.github.com/repos/starkware-libs/cairo/actions/artifacts/609478476/zip
