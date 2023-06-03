@@ -76,7 +76,6 @@ fn test_u60f18_arithmetic() {
     let a: U60F18 = 57.into();
     let mut b: U60F18 = 68.into();
     b /= 1000.into();
-    (a * b).into();
     assert(a * b == b * a, 'u60f18 mul noncommute');
     assert(b < a, 'u60f18 lt failed');
     assert(b <= a, 'u60f18 le failed');
