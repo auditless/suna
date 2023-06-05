@@ -40,7 +40,7 @@ This is how you can use the Zeroable implementation:
 ```cairo
 use suna::math::u256::U256Zeroable;
 
-let number: u256 = 33.into();
+let number: u256 = 33_u256;
 // Check if number is zero
 Zeroable::is_zero(0)
 ```
@@ -54,9 +54,9 @@ controls. You can do it as follows:
 ```cairo
 use suna::math::u60f18::U256MulDiv;
 
-let total_supply: u256 = 10000.into();
-let shares: u256 = 33.into();
-let total_assets: u256 = 853000000000000000000.into();
+let total_supply: u256 = 10000_u256;
+let shares: u256 = 33_u256;
+let total_assets: u256 = 853000000000000000000_u256;
 // Calculates shares * total_assets / total_supply safely
 let assets_owned = U256MulDiv::mul_div(shares, total_assets, total_supply);
 ```
