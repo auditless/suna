@@ -58,16 +58,16 @@ fn test_mul_div_up_failed() {
 
 #[test]
 fn test_u256_to_u60f18_conversion() {
-    let base: u256 = 1000000000000000000.into();
-    let a: u256 = 2.into();
+    let base: u256 = 1000000000000000000_u256;
+    let a: u256 = 2_u256;
     let a_fraction: U60F18 = a.into();
     assert(a_fraction.scaled == a * base, 'u60f18 conversion invalid');
 }
 #[test]
 fn test_u60f18_to_u256_conversion() {
-    let base: u256 = 1000000000000000000.into();
-    let a: u256 = 2.into();
-    let a_fraction = U60F18 { scaled: a * base + 95.into() };
+    let base: u256 = 1000000000000000000_u256;
+    let a: u256 = 2_u256;
+    let a_fraction = U60F18 { scaled: a * base + 95_u256 };
     assert(a == a_fraction.into(), 'u60f18 conversion invalid');
 }
 

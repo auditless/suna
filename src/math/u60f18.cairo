@@ -51,8 +51,8 @@ impl U256MulDiv of MulDiv<u256> {
             Rounding::Down(_) => result,
             Rounding::Up(_) => if unsafe_mul_mod(
                 lhs, rhs, denominator
-            ) > 0.into() {
-                result + 1.into()
+            ) > 0_u256 {
+                result + 1_u256
             } else {
                 result
             },
@@ -99,7 +99,7 @@ impl U60F18SubEq of SubEq<U60F18> {
 
 impl U60F18Mul of Mul<U60F18> {
     fn mul(lhs: U60F18, rhs: U60F18) -> U60F18 {
-        let base: u256 = 1000000000000000000.into();
+        let base: u256 = 1000000000000000000_u256;
         U60F18 { scaled: mul_div_down(lhs.scaled, rhs.scaled, base) }
     }
 }
@@ -113,7 +113,7 @@ impl U60F18MulEq of MulEq<U60F18> {
 
 impl U60F18Div of Div<U60F18> {
     fn div(lhs: U60F18, rhs: U60F18) -> U60F18 {
-        let base: u256 = 1000000000000000000.into();
+        let base: u256 = 1000000000000000000_u256;
         U60F18 { scaled: mul_div_down(lhs.scaled, base, rhs.scaled) }
     }
 }
@@ -157,14 +157,14 @@ impl U60F18PartialOrd of PartialOrd<U60F18> {
 
 impl U60F18ToU256 of Into<U60F18, u256> {
     fn into(self: U60F18) -> u256 {
-        let base: u256 = 1000000000000000000.into();
+        let base: u256 = 1000000000000000000_u256;
         self.scaled / base
     }
 }
 
 impl U256ToU60F18 of Into<u256, U60F18> {
     fn into(self: u256) -> U60F18 {
-        let base: u256 = 1000000000000000000.into();
+        let base: u256 = 1000000000000000000_u256;
         U60F18 { scaled: self * base }
     }
 }
