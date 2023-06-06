@@ -2,6 +2,8 @@
 
 use core::zeroable::Zeroable;
 
+impl NumericLiteralU256 of NumericLiteral<u256>;
+
 /// Canonical implementation of Zeroable for u256.
 impl U256Zeroable of Zeroable::<u256> {
     #[inline(always)]
